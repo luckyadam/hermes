@@ -3,7 +3,7 @@
  * 串行下载，下载统计
  */
 
-var resourceLoader = (function (global) {
+var ResourceLoader = (function (global) {
 
   var Util = {
     getType: function (arg) {
@@ -286,7 +286,7 @@ var resourceLoader = (function (global) {
     }
   };
 
-  var ResourceLoader = {
+  var _ResourceLoader = {
     load: function (param) {
       var deps = param.deps || null;
       if (deps === null) {
@@ -306,6 +306,6 @@ var resourceLoader = (function (global) {
     }
   };
 
-  global.ResourceLoader = ResourceLoader;
+  return _ResourceLoader;
 
 })(window);
