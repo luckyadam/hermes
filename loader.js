@@ -3,7 +3,7 @@
  * 串行下载，下载统计
  */
 
-var ResourceLoader = (function (global) {
+(function (global) {
   'use strict';
 
   /** 一些基础性方法 */
@@ -26,6 +26,9 @@ var ResourceLoader = (function (global) {
 
     /** 对象和数组的遍历 */
     forEach: function (arg, fn) {
+      if (!arg) {
+        return;
+      }
       if (arg.forEach) {
         arg.forEach.call(arg, fn);
       } else {
@@ -47,6 +50,7 @@ var ResourceLoader = (function (global) {
         }
       }
     },
+
     /** 仅仅是浅拷贝 */
     extend: function (destination, source) {
       for(var key in source) {
@@ -55,6 +59,60 @@ var ResourceLoader = (function (global) {
         }
       }
       return destination;
+    },
+
+    /** 封装一下ajax **/
+    ajax: function (options) {
+      var xhr = null;
+      if (global.XMLHttpRequest) {
+        xhr = new global.XMLHttpRequest();
+      } else if (global.ActiveXObject) {
+        try {
+          xhr = new global.ActiveXObject('Msxml2.XMLHTTP');
+        } catch (e) {
+          xhr = new global.ActiveXObjec('Microsoft.XMLHTTP');
+        }
+      }
+
+      if (xhr !== null) {
+        return;
+      }
+      options = this.extend({
+        method: 'GET',
+        url: null,
+        data: null,
+        isAsync: true,
+        success: null,
+        error: null
+      }, options);
+      var dataStr = '';
+      if (options.method === 'GET' && this.getType(options.data) === '[object Object]') {
+        this.forEach(options.data, function (item, key) {
+          dataStr += key + '=' + global.encodeURIComponent(item) + '&';
+        });
+        dataStr = substr(0, dataStr.length - 1);
+        if (options.url.indexOf('?') >= 0) {
+          options.url += '&' + dataStr;
+        } else {
+          options.url += '?' + dataStr;
+        }
+      }
+      xhr.open(options.method, options.url, options.isAsync);
+      if (options.method === 'GET') {
+        xhr.send(null);
+      } else if (options.method === 'POST') {
+        xhr.send(options.data);
+      }
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            options.success && options.success(xhr.responseText);
+          } else {
+            options.error && options.error();
+          }
+        }
+      };
     }
   };
 
@@ -284,8 +342,9 @@ var ResourceLoader = (function (global) {
      * @private
      * @param {String} item 文件url
      */
-    _onItemError: function () {
-      this.runHandler(this.handler.onError, item);
+    _onItemError: function (item) {
+      this.runHandler(this.handler.onItemError, item)
+        .runHandler(this.handler.onError, item);
       this._toComplete();
       this._toContinue();
       this._toPause();
@@ -427,7 +486,7 @@ var ResourceLoader = (function (global) {
   };
 
   /** 资源下载器，实例化下载池子 **/
-  var _ResourceLoader = {
+  var ResourceLoader = {
     load: function (param) {
       var deps = param.deps || null;
       if (deps === null || !deps.length) {
@@ -450,6 +509,7 @@ var ResourceLoader = (function (global) {
         var endDate = new Date();
         var endTimeStamp = endDate.getTime();
         timeStat[url] && (timeStat[url].endTime = endTimeStamp);
+        console.log('资源 ' + url + '下载完成！');
       }).bind('onItemError', function (url) {
         console.log('资源 ' + url + '加载失败');
       }).bind('onComplete', function () {
@@ -460,5 +520,30 @@ var ResourceLoader = (function (global) {
     }
   };
 
-  return _ResourceLoader;
+  // 在window onload中去预加载资源
+  // global.onload = function () {
+  //   // 首先想服务请求资源列表
+  //   Util.ajax({
+  //     method: 'GET',
+  //     url: '',
+  //     data: {
+  //       id: global.location.href
+  //     },
+  //     success: function (data) {
+  //       console.log(data);
+  //       ResourceLoader.load(data);
+  //     }
+  //   });
+  // };
+  ResourceLoader.load({
+    "deps":[
+      "http://labs.qiang.it/labs/preloader/images/bg1.png",
+      "http://labs.qiang.it/labs/preloader/images/bg2.jpg",
+      "http://labs.qiang.it/labs/preloader/images/bg3.jpg",
+      "http://labs.qiang.it/labs/preloader/jquery-test.js",
+      "http://labs.qiang.it/labs/preloader/step_2.css",
+      "test.js",
+    ]
+  });
+
 })(window);
