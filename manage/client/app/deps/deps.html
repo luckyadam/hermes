@@ -1,0 +1,22 @@
+<section class="deps common_section">
+  <h1 class="clearfix">页面依赖管理<button class="btn btn--m btn--green btn--raised deps_add" lx-ripple>新增页面</button></h1>
+  <div class="deps_list">
+    <div class="card deps_item" ng-repeat="dep in deps">
+      <div class="card__header clearfix">
+        <span class="deps_item_url">{{ dep.uri }}</span>
+        <button class="deps_item_delete btn btn--m btn--red btn--icon" lx-ripple><i class="mdi mdi-delete"></i></button>
+        <button class="deps_item_edit btn btn--m btn--blue btn--icon" lx-ripple><i class="mdi mdi-pencil"></i></button>
+      </div>
+      <div class="card__body">
+        <p class="deps_item_description">{{ dep.description }}</p>
+        <p class="deps_item_info">
+          <span class="deps_item_info_author">创建者：{{ dep.creator }}</span>
+          <span class="deps_item_info_time">创建时间：{{ dep.createTime }}</span>
+        </p>
+        <div class="deps_item_pages clearfix">
+          <a href="/resources/{{ page._id }}" ng-repeat="page in dep.dep" class="deps_item_pages_link btn btn--m btn--blue btn--flat" lx-ripple>{{ page.uri }}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

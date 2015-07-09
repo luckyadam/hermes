@@ -1,0 +1,30 @@
+.deps>h1 {
+  font-size: 20px;
+}
+.deps_list {
+  margin-top: 16px;
+}
+.deps_item_edit,.deps_item_delete {
+  color: #fff;
+  font-size: 12px;
+  float: right;
+}
+.deps_add {
+  float: right;
+}
+.deps_item {
+  margin-bottom: 12px;
+}
+.deps_item_description {
+  margin-bottom: 8px;
+}
+.deps_item_info {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 8px;
+}
+.deps_item_pages_link {
+  float: left;
+  display: block;
+  text-transform: none;
+}

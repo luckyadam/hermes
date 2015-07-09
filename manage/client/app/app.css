@@ -1,0 +1,28 @@
+@charset "UTF-8";
+
+body {
+  font-family: Helvetica, STHeiti STXihei, Microsoft JhengHei, Microsoft YaHei, Arial;
+}
+
+a {
+  text-decoration: none;
+}
+
+
+.container {
+  padding: 60px 0 0;
+}
+
+.common_section {
+  padding: 24px;
+}
+
+.card__header {
+  padding: 6px 16px;
+  border-bottom: 1px solid #dddddd;
+  color: #333;
+  line-height: 36px;
+}
+.card__body {
+  padding: 8px 16px;
+}
