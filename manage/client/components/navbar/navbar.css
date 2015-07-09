@@ -78,6 +78,9 @@
   line-height: 36px;
   text-decoration: none;
 }
+.main-nav__link.active {
+  background-color: #1565C0;
+}
 @media screen and (min-width: 481px) and (max-width: 1023px) {
   .main-nav__link {
     font-size: 14px;

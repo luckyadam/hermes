@@ -11,11 +11,10 @@
             Hermes
         </a>
     </h1>
-
     <nav class="main-nav main-nav--lap-and-up">
         <ul>
-            <li><a href="/deps" class="main-nav__link" lx-ripple="white">页面依赖</a></li>
-            <li><a href="/resources" class="main-nav__link" lx-ripple="white">静态资源</a></li>
+            <li><a href="/deps" class="main-nav__link" ng-class="{true: 'active'}[pageName === 'deps']" lx-ripple="white">页面依赖</a></li>
+            <li><a href="/resources" class="main-nav__link" ng-class="{true: 'active'}[pageName === 'resources']" lx-ripple="white">静态资源</a></li>
             <li><a href="#" class="main-nav__link" lx-ripple="white">操作记录</a></li>
             <li><a href="/user" class="main-nav__link" lx-ripple="white">用户管理</a></li>
         </ul>

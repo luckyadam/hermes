@@ -23,7 +23,7 @@ exports.show = function(req, res) {
     return res.json({
       no: 0,
       errmsg: '成功',
-      data: page
+      data: [page]
     });
   });
 };

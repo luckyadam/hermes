@@ -1,3 +1,18 @@
-<div class="col-md-12">
-This is the resources view.
-</div>
+<section class="resources common_section">
+  <h1 class="clearfix">静态资源管理<button class="btn btn--m btn--green btn--raised resources_add" lx-ripple>新增页面</button></h1>
+  <div class="resources_list">
+    <div class="card resources_item" ng-repeat="page in resources">
+      <div class="card__header clearfix">
+        <span class="resources_item_url">{{ page.uri }}</span>
+        <button class="resources_item_delete btn btn--m btn--red btn--icon" lx-ripple><i class="mdi mdi-delete"></i></button>
+        <button class="resources_item_edit btn btn--m btn--blue btn--icon" lx-ripple><i class="mdi mdi-pencil"></i></button>
+      </div>
+      <div class="card__body">
+        <p class="resources_item_description">{{ page.description }}</p>
+        <div class="resources_item_pages clearfix">
+          <a href="/resources/{{ resource._id }}" ng-repeat="resource in page.resources" class="resources_item_pages_link btn btn--m btn--blue btn--flat" lx-ripple>{{ resource.uri }}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,8 +1,9 @@
 'use strict';
 
 angular.module('manageApp')
-  .controller('ResourcesCtrl', function ($scope, $routeParams, Resources) {
+  .controller('ResourcesCtrl', function ($rootScope, $scope, $routeParams, Resources) {
     var id = $routeParams.id;
+    $rootScope.pageName = 'resources';
     Resources.get({
       id: id
     }).$promise.then(function (data) {

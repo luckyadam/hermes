@@ -1,0 +1,25 @@
+.resources>h1 {
+  font-size: 20px;
+}
+.resources_list {
+  margin-top: 16px;
+}
+.resources_item_edit,.resources_item_delete {
+  color: #fff;
+  font-size: 12px;
+  float: right;
+}
+.resources_add {
+  float: right;
+}
+.resources_item {
+  margin-bottom: 12px;
+}
+.resources_item_description {
+  margin-bottom: 8px;
+}
+.resources_item_pages_link {
+  float: left;
+  display: block;
+  text-transform: none;
+}
