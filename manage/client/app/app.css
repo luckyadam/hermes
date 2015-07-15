@@ -7,7 +7,9 @@ body {
 a {
   text-decoration: none;
 }
-
+ul,li {
+  list-style: none;
+}
 
 .container {
   padding: 60px 0 0;

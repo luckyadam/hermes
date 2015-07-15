@@ -14,7 +14,7 @@ var DepSchema = new Schema({
   product: String,
   creator: { type: Schema.Types.ObjectId, ref: 'User' },
   createTime: Date,
-  dep: [{ type: Schema.Types.ObjectId, ref: 'Page' }]
+  pages: [{ type: Schema.Types.ObjectId, ref: 'Page' }]
 });
 
 module.exports = mongoose.model('Dep', DepSchema);

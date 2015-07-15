@@ -16,6 +16,8 @@ var PageSchema = new Schema({
     require: true
   },
   description: String,
+  creator: { type: Schema.Types.ObjectId, ref: 'User' },
+  createTime: Date,
   resources: [ResourceSchema],
   enabled: { type: Boolean, default: true }
 });

@@ -18,8 +18,43 @@
 .resources_item_description {
   margin-bottom: 8px;
 }
+.resources_item_info {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 8px;
+}
 .resources_item_pages_link {
   float: left;
   display: block;
   text-transform: none;
+}
+.resources_edit {
+  margin-top: 8px;
+}
+.resources_edit_loading {
+  position: absolute;
+  top: 0;
+  right: 25px;
+}
+.resources_edit_title {
+  font-size: 12px;
+  color: rgba(0,0,0,.54);
+  margin-bottom: 6px;
+}
+.resources_edit_item {
+  background-color: #efefef;
+  margin-bottom: 6px;
+}
+.resources_edit_item_txt {
+  font-size: 13px;
+  padding: 4px 8px;
+  color: #666;
+  vertical-align: middle;
+  display: inline-block;
+}
+.resources_edit_item>.btn {
+  float: right;
+}
+
+.resources_new_item_input {
 }

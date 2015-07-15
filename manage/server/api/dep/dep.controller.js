@@ -7,7 +7,7 @@ var UserController = require('../user/user.controller');
 
 // Get list of deps
 exports.index = function(req, res) {
-  Dep.find().populate('dep').exec(function (err, deps) {
+  Dep.find().populate('pages').sort({createTime: 'desc'}).exec(function (err, deps) {
     if(err) { return handleError(res, err); }
     return res.json(200, {
       no: 0,
@@ -19,7 +19,7 @@ exports.index = function(req, res) {
 
 // Get a single dep
 exports.show = function(req, res) {
-  Dep.findById(req.params.id).populate('dep').exec(function (err, dep) {
+  Dep.findById(req.params.id).populate('pages').exec(function (err, dep) {
     if(err) { return handleError(res, err); }
     if(!dep) { return res.send(404); }
     return res.json(dep);
@@ -31,12 +31,13 @@ exports.create = function(req, res) {
   var body = req.body;
   var existDeps = req.body.existDeps; // 已经存在的
   var createDeps = req.body.createDeps; // 需要新创建
+  var now = new Date().getTime();
   // var user = {UserController.me(req, res);}
   var depParam = {
     uri: body.uri,
     description: body.description,
     // creator: 'admin',
-    createTime: new Date().getTime()
+    createTime: now
   };
   if (!_.isArray(existDeps) && !_.isArray(createDeps)) {
     return res.json(200, {
@@ -46,7 +47,8 @@ exports.create = function(req, res) {
 
   }
   // 需要创建新的依赖关系
-  if (_.isArray(createDeps)) {
+  if (_.isArray(createDeps) && createDeps.length > 0) {
+    createDeps.createTime = now;
     Page.collection.insert(createDeps, function (err, pages) {
       if(err) {
         if (err.code === 11000) {
@@ -58,15 +60,19 @@ exports.create = function(req, res) {
         return handleError(res, err);
       }
       var pagesIds = _.pluck(pages, '_id');
-      if (_.isArray(existDeps)) {
-        depParam.dep = pagesIds.concat(existDeps);
+      if (_.isArray(existDeps) && existDeps.length > 0) {
+        existDeps = _.pluck(existDeps, '_id');
+        depParam.pages = pagesIds.concat(existDeps);
       } else {
-        depParam.dep = pagesIds;
+        depParam.pages = pagesIds;
       }
       createOneDepByParam(depParam, res);
     });
   } else {
-    depParam.dep = existDeps;
+    if (_.isArray(existDeps) && existDeps.length > 0) {
+      existDeps = _.pluck(existDeps, '_id');
+    }
+    depParam.pages = existDeps;
     createOneDepByParam(depParam, res);
   }
 };
@@ -77,11 +83,65 @@ exports.update = function(req, res) {
   Dep.findById(req.params.id, function (err, dep) {
     if (err) { return handleError(res, err); }
     if(!dep) { return res.send(404); }
-    var updated = _.merge(dep, req.body);
-    updated.save(function (err) {
-      if (err) { return handleError(res, err); }
-      return res.json(200, dep);
-    });
+    var body = req.body;
+    var depPages = body.pages;
+    var createDeps = body.createDeps;
+    var existDeps = body.existDeps;
+    var depsParam = [];
+    if (_.isArray(createDeps) && createDeps.length > 0) {
+      Page.collection.insert(createDeps, function (err, pages) {
+        if(err) {
+          if (err.code === 11000) {
+            return res.json(200, {
+              no: 10001,
+              errmsg: '所依赖的页面已经存在'
+            });
+          }
+          return handleError(res, err);
+        }
+        var pagesIds = _.pluck(pages, '_id');
+        if (_.isArray(existDeps) && existDeps.length > 0) {
+          existDeps = _.pluck(existDeps, '_id');
+          depsParam = depsParam.concat(existDeps);
+        }
+        depsParam = depsParam.concat(pagesIds);
+        depPages = _.pluck(depPages, '_id');
+        depPages = depPages.concat(depsParam);
+        dep.pages = depPages;
+        delete req.body.pages;
+        delete req.body.createDeps;
+        delete req.body.existDeps;
+        var updated = _.assign(dep, req.body);
+        updated.save(function (err) {
+          if (err) { return handleError(res, err); }
+          return res.json(200, {
+            no: 0,
+            errmsg: '成功',
+            data: dep
+          });
+        });
+      });
+    } else {
+      if (_.isArray(existDeps) && existDeps.length > 0) {
+        existDeps = _.pluck(existDeps, '_id');
+        depsParam = depsParam.concat(existDeps);
+      }
+      depPages = _.pluck(depPages, '_id');
+      depPages = depPages.concat(depsParam);
+      dep.pages = depPages;
+      delete req.body.pages;
+      delete req.body.createDeps;
+      delete req.body.existDeps;
+      var updated = _.assign(dep, req.body);
+      updated.save(function (err) {
+        if (err) { return handleError(res, err); }
+        return res.json(200, {
+          no: 0,
+          errmsg: '成功',
+          data: dep
+        });
+      });
+    }
   });
 };
 

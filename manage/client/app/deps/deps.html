@@ -1,22 +1,82 @@
 <section class="deps common_section">
-  <h1 class="clearfix">页面依赖管理<button class="btn btn--m btn--green btn--raised deps_add" lx-ripple>新增页面</button></h1>
+  <h1 class="clearfix">页面依赖管理<button class="btn btn--m btn--green btn--raised deps_add" ng-click="add()" lx-ripple>新增页面</button></h1>
   <div class="deps_list">
-    <div class="card deps_item" ng-repeat="dep in deps">
+    <div class="card deps_item" ng-repeat="depItem in depsList">
       <div class="card__header clearfix">
-        <span class="deps_item_url">{{ dep.uri }}</span>
-        <button class="deps_item_delete btn btn--m btn--red btn--icon" lx-ripple><i class="mdi mdi-delete"></i></button>
-        <button class="deps_item_edit btn btn--m btn--blue btn--icon" lx-ripple><i class="mdi mdi-pencil"></i></button>
+        <span class="deps_item_url">{{ depItem.uri }}</span>
+        <button ng-click="delete($index)" class="deps_item_delete btn btn--m btn--red btn--icon" lx-ripple><i class="mdi mdi-delete"></i></button>
+        <button ng-click="edit(depItem)" class="deps_item_edit btn btn--m btn--blue btn--icon" lx-ripple><i class="mdi mdi-pencil"></i></button>
       </div>
       <div class="card__body">
-        <p class="deps_item_description">{{ dep.description }}</p>
+        <p class="deps_item_description">{{ depItem.description }}</p>
         <p class="deps_item_info">
-          <span class="deps_item_info_author">创建者：{{ dep.creator }}</span>
-          <span class="deps_item_info_time">创建时间：{{ dep.createTime }}</span>
+          <span class="deps_item_info_author">创建者：{{ depItem.creator }}</span>
+          <span class="deps_item_info_time">创建时间：{{ depItem.createTime | date:'yyyy-MM-dd HH:mm' }}</span>
         </p>
         <div class="deps_item_pages clearfix">
-          <a href="/resources/{{ page._id }}" ng-repeat="page in dep.dep" class="deps_item_pages_link btn btn--m btn--blue btn--flat" lx-ripple>{{ page.uri }}</a>
+          <a href="/resources/{{ page._id }}" ng-repeat="page in depItem.pages" class="deps_item_pages_link btn btn--m btn--blue btn--flat" lx-ripple>{{ page.uri }}</a>
         </div>
       </div>
     </div>
   </div>
 </section>
+<lx-dialog class="dialog dialog--l" id="editDepsDialog" auto-close="true" onclose="closingDialog()" onscrollend="scrollEndDialog()">
+  <div class="dialog__header">
+    <div class="toolbar bgc-light-blue-700 pl++">
+      <span class="toolbar__label tc-white fs-title">
+        编辑
+      </span>
+      <lx-progress class="deps_edit_loading" type="circular" color="#fff" ng-if="currentEdit.showLoading"></lx-progress>
+    </div>
+  </div>
+
+  <div class="dialog__content pl++ pr++">
+    <lx-text-field label="页面url">
+      <input type="text" ng-model="currentEdit.uri">
+    </lx-text-field>
+    <lx-text-field label="页面说明">
+      <input type="text" ng-model="currentEdit.description">
+    </lx-text-field>
+    <div class="deps_edit" ng-show="currentEdit.pages.length > 0">
+      <p class="deps_edit_title">依赖页面</p>
+      <ul class="deps_edit_list clearfix">
+        <li class="deps_edit_item" ng-repeat="page in currentEdit.pages"><span class="deps_edit_item_txt">{{ page.uri }}</span><button class="btn btn--s btn--red btn--icon" ng-click="deleteCurrentOneDep($index)" lx-ripple><i class="mdi mdi-minus-circle"></i></button></li>
+      </ul>
+    </div>
+    <div class="deps_new">
+      <p class="deps_new_title">新增依赖<a class="deps_new_title_link" ng-class="{ true: 'active' }[currentEdit.showExist]" href="javascript:;" ng-click="currentEdit.showExist=true;">从已有页面中选择</a><a class="deps_new_title_link"  ng-class="{ true: 'active' }[!currentEdit.showExist]" href="javascript:;" ng-click="currentEdit.showExist=false;">新添加</a></p>
+      <div class="deps_new_exist" ng-show="currentEdit.showExist">
+        <button class="btn btn--s btn--green btn--raised" ng-click="addExistOne()" lx-ripple>新增一个</button>
+        <div flex-container="row" ng-repeat="existDep in currentEdit.existDeps track by $index">
+          <lx-select class="deps_new_select" flex-item ng-model="currentEdit.existDeps[$index]" change="cbSelect.exec(newValue, oldValue)" placeholder="请输入查询的关键字" choices="fetchExistDeps.list" filter="fetchExistDeps.update(newValue, oldValue)" loading="{{ fetchExistDeps.loading }}" min-length="2" allow-clear="true" selection-to-model="fetchExistDeps.toModel(data, callback)">
+            <lx-select-selected>
+              {{ $selected.uri }} ({{ $selected.description }})
+            </lx-select-selected>
+
+            <lx-select-choices>
+              {{ $choice.uri }} - {{ $choice.description }}
+            </lx-select-choices>
+          </lx-select>
+          <button class="float--left btn btn--m btn--red btn--icon" ng-click="deleteExistOne($index)" lx-ripple><i class="mdi mdi-minus-circle"></i></button>
+        </div>
+      </div>
+      <div class="deps_new_create" ng-show="!currentEdit.showExist">
+        <button class="btn btn--s btn--green btn--raised" ng-click="addCreateOne()" lx-ripple>新增一个</button>
+        <div class="deps_new_input" ng-repeat="createDep in currentEdit.createDeps">
+            <lx-text-field label="页面url">
+              <input type="text" ng-model="createDep.uri">
+            </lx-text-field>
+            <lx-text-field label="页面介绍">
+              <input type="text" ng-model="createDep.description">
+            </lx-text-field>
+            <button class="float--left btn btn--m btn--red btn--icon" ng-click="deleteCreateOne($index)" lx-ripple><i class="mdi mdi-minus-circle"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog__actions">
+    <button class="btn btn--m btn--black btn--flat" lx-ripple lx-dialog-close>取消</button>
+    <button class="btn btn--m btn--black btn--flat" ng-click="saveEdit()" lx-ripple>确定</button>
+  </div>
+</lx-dialog>

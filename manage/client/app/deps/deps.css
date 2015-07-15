@@ -28,3 +28,41 @@
   display: block;
   text-transform: none;
 }
+.deps_edit,.deps_new {
+  margin-top: 8px;
+}
+.deps_edit_loading {
+  position: absolute;
+  top: 0;
+  right: 25px;
+}
+.deps_edit_title,.deps_new_title {
+  font-size: 12px;
+  color: rgba(0,0,0,.54);
+  margin-bottom: 6px;
+}
+.deps_edit_item {
+  float: left;
+  background-color: #efefef;
+  margin-right: 8px;
+  margin-bottom: 6px;
+}
+.deps_edit_item_txt {
+  font-size: 13px;
+  padding: 4px 8px;
+  color: #666;
+  vertical-align: middle;
+  display: inline-block;
+}
+.deps_new_select {
+  margin-top: 0;
+  float: left;
+}
+.deps_new_title_link {
+  font-size: 12px;
+  margin-left: 16px;
+  color: #61B1DD;
+}
+.deps_new_title_link.active {
+  color: #666;
+}

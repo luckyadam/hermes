@@ -11,7 +11,7 @@ angular.module('manageApp', [
   .config(function ($routeProvider, $locationProvider, $httpProvider) {
     $routeProvider
       .otherwise({
-        redirectTo: '/'
+        redirectTo: '/deps'
       });
 
     $locationProvider.html5Mode(true);
