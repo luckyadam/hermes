@@ -10,7 +10,7 @@
     "angular-cookies": ">=1.2.*",
     "angular-sanitize": ">=1.2.*",
     "angular-route": ">=1.2.*",
-    "lodash": "~2.4.1",
+    "lodash": "~3.10.0",
     "angular-socket-io": "~0.6.0",
     "lumx": "~0.3.64"
   },

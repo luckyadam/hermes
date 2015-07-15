@@ -1,9 +1,12 @@
 'use strict';
 
 var _ = require('lodash');
+var fs = require('fs');
+var path = require('path');
 var Dep = require('./dep.model');
 var Page = require('../page/page.model');
 var UserController = require('../user/user.controller');
+var config = require('../../config/environment');
 
 // Get list of deps
 exports.index = function(req, res) {
@@ -153,6 +156,22 @@ exports.destroy = function(req, res) {
     dep.remove(function(err) {
       if(err) { return handleError(res, err); }
       return res.send(204);
+    });
+  });
+};
+
+// 读取所有数据，生成配置文件
+exports.generateAll = function (req, res) {
+  Dep.find().populate('pages').exec(function (err, deps) {
+    if(err) { return handleError(res, err); }
+    fs.writeFile(path.join(config.root + '/server/data', 'config_file.js'), JSON.stringify(deps), function (err) {
+      if (err) {
+        throw err;
+      }
+      return res.json(200, {
+        no: 0,
+        errmsg: '生成文件成功'
+      });
     });
   });
 };

@@ -63,8 +63,14 @@ angular.module('manageApp')
 
     $scope.saveEdit = function () {
       var editPage = angular.copy($scope.currentEdit);
-      $scope.currentEdit.showLoading = true;
+
       delete editPage.modifyType;
+
+      if ($scope.uriValidation() || $scope.emptyValidation()) {
+        LxNotificationService.error('请输入正确！');
+        return;
+      }
+      $scope.currentEdit.showLoading = true;
       if ($.isArray(editPage.newResources)) {
         editPage.resources = editPage.resources.concat(editPage.newResources);
       }
@@ -82,6 +88,14 @@ angular.module('manageApp')
           getResourcesList();
         });
       }
+    };
+
+    $scope.uriValidation = function (input) {
+      return ServiceHelper.regRex.url.test(input);
+    };
+
+    $scope.emptyValidation = function (input) {
+      return ServiceHelper.regRex.empty.test(input);
     };
 
     getResourcesList();

@@ -5,6 +5,10 @@ angular.module('manageApp')
     'LxNotificationService',
     function(LxNotificationService) {
       return {
+        regRex: {
+          url: /^(http[s]?:\/\/(www\.)?|ftp:\/\/(www\.)?|www\.){1}([0-9A-Za-z-\.@:%_+~#=]+)+((\.[a-zA-Z]{2,3})+)(\/(.)*)?(\?(.)*)?/,
+          empty: /\S+/
+        },
         alert: function (msg, callback) {
           LxNotificationService.alert(
             '提示',

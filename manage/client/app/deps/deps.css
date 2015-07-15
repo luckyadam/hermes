@@ -9,8 +9,11 @@
   font-size: 12px;
   float: right;
 }
-.deps_add {
+.deps_add,.deps_generate {
   float: right;
+}
+.deps_generate {
+  margin-right: 16px;
 }
 .deps_item {
   margin-bottom: 12px;

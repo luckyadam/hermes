@@ -25,6 +25,12 @@ angular.module('manageApp')
       LxDialogService.open('editDepsDialog');
     };
 
+    $scope.generate = function () {
+      Deps.generateAll().$promise.then(function (data) {
+        console.log(data);
+      });
+    };
+
     $scope.add = function () {
       $scope.currentEdit = {
         existDeps: [],
@@ -79,6 +85,17 @@ angular.module('manageApp')
       var editData = angular.copy($scope.currentEdit);
       delete editData.showExist;
       delete editData.showLoading;
+
+      editData.existDeps = _.dropWhile(editData.existDeps, function (item) {
+        return item === null;
+      });
+      editData.existDeps = _.dropRightWhile(editData.existDeps, function (item) {
+        return item === null;
+      });
+      if ($scope.uriValidation() || $scope.emptyValidation()) {
+        LxNotificationService.error('请输入正确！');
+        return;
+      }
       $scope.currentEdit.showLoading = true;
       if ($scope.modifyType === 'edit') {
         Deps.update(editData).$promise.then(function (data) {
@@ -93,6 +110,14 @@ angular.module('manageApp')
           getDepsList();
         });
       }
+    };
+
+    $scope.uriValidation = function (input) {
+      return ServiceHelper.regRex.url.test(input);
+    };
+
+    $scope.emptyValidation = function (input) {
+      return ServiceHelper.regRex.empty.test(input);
     };
 
     getDepsList();

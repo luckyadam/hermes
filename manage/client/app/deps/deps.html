@@ -1,5 +1,5 @@
 <section class="deps common_section">
-  <h1 class="clearfix">页面依赖管理<button class="btn btn--m btn--green btn--raised deps_add" ng-click="add()" lx-ripple>新增页面</button></h1>
+  <h1 class="clearfix">页面依赖管理<button class="btn btn--m btn--green btn--raised deps_add" ng-click="add()" lx-ripple>新增页面</button><button class="btn btn--m btn--green btn--raised deps_generate" ng-click="generate()" lx-ripple>生成文件</button></h1>
   <div class="deps_list">
     <div class="card deps_item" ng-repeat="depItem in depsList">
       <div class="card__header clearfix">
@@ -31,12 +31,18 @@
   </div>
 
   <div class="dialog__content pl++ pr++">
-    <lx-text-field label="页面url">
-      <input type="text" ng-model="currentEdit.uri">
-    </lx-text-field>
-    <lx-text-field label="页面说明">
-      <input type="text" ng-model="currentEdit.description">
-    </lx-text-field>
+    <div>
+      <lx-text-field label="页面url" error="!uriValidation(currentEdit.uri)">
+        <input type="text" ng-model="currentEdit.uri">
+      </lx-text-field>
+      <span class="text-field-error" ng-if="!uriValidation(currentEdit.uri)">url格式错误</span>
+    </div>
+    <div>
+      <lx-text-field label="页面说明" error="!emptyValidation(currentEdit.description)">
+        <input type="text" ng-model="currentEdit.description">
+      </lx-text-field>
+      <span class="text-field-error" ng-if="!emptyValidation(currentEdit.description)">描述不能为空</span>
+    </div>
     <div class="deps_edit" ng-show="currentEdit.pages.length > 0">
       <p class="deps_edit_title">依赖页面</p>
       <ul class="deps_edit_list clearfix">
@@ -62,14 +68,18 @@
       </div>
       <div class="deps_new_create" ng-show="!currentEdit.showExist">
         <button class="btn btn--s btn--green btn--raised" ng-click="addCreateOne()" lx-ripple>新增一个</button>
-        <div class="deps_new_input" ng-repeat="createDep in currentEdit.createDeps">
+        <div class="deps_new_input" flex-container="row" flex-align="end end" flex-gutter="24" ng-repeat="createDep in currentEdit.createDeps">
+          <div flex-item>
             <lx-text-field label="页面url">
               <input type="text" ng-model="createDep.uri">
             </lx-text-field>
+          </div>
+          <div flex-item>
             <lx-text-field label="页面介绍">
               <input type="text" ng-model="createDep.description">
             </lx-text-field>
-            <button class="float--left btn btn--m btn--red btn--icon" ng-click="deleteCreateOne($index)" lx-ripple><i class="mdi mdi-minus-circle"></i></button>
+          </div>
+          <button class="float--left btn btn--m btn--red btn--icon" ng-click="deleteCreateOne($index)" lx-ripple><i class="mdi mdi-minus-circle"></i></button>
         </div>
       </div>
     </div>

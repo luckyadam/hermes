@@ -31,12 +31,18 @@
   </div>
 
   <div class="dialog__content pl++ pr++">
-    <lx-text-field label="页面url">
-      <input type="text" ng-model="currentEdit.uri">
-    </lx-text-field>
-    <lx-text-field label="页面说明">
-      <input type="text" ng-model="currentEdit.description">
-    </lx-text-field>
+    <div>
+      <lx-text-field label="页面url" error="!uriValidation(currentEdit.uri)">
+        <input type="text" ng-model="currentEdit.uri">
+      </lx-text-field>
+      <span class="text-field-error" ng-if="!uriValidation(currentEdit.uri)">url格式错误</span>
+    </div>
+    <div>
+      <lx-text-field label="页面说明" error="!emptyValidation(currentEdit.description)">
+        <input type="text" ng-model="currentEdit.description">
+      </lx-text-field>
+      <span class="text-field-error" ng-if="!emptyValidation(currentEdit.description)">页面说明不能为空</span>
+    </div>
     <div class="resources_edit">
       <p class="resources_edit_title">编辑资源列表</p>
       <ul class="resources_edit_list">
@@ -46,13 +52,17 @@
     <div class="resources_new">
       <button class="btn btn--s btn--green btn--raised" ng-click="addOne()" lx-ripple>新增一个</button>
       <ul class="resources_new_list">
-       <li class="resources_new_item" flex-container="row" flex-align="end end" ng-repeat="newResource in currentEdit.newResources">
-        <lx-text-field class="resources_new_item_input" label="资源url" flex-item>
-          <input type="text" ng-model="newResource.uri">
-        </lx-text-field>
-        <lx-text-field class="resources_new_item_input" label="资源类型" flex-item>
-          <input type="text" ng-model="newResource.type">
-        </lx-text-field>
+       <li class="resources_new_item" flex-container="row" flex-align="end end" flex-gutter="24" ng-repeat="newResource in currentEdit.newResources">
+        <div flex-item>
+          <lx-text-field class="resources_new_item_input" label="资源url">
+            <input type="text" ng-model="newResource.uri">
+          </lx-text-field>
+        </div>
+        <div flex-item>
+          <lx-text-field class="resources_new_item_input" label="资源类型">
+            <input type="text" ng-model="newResource.type">
+          </lx-text-field>
+        </div>
         <button class="float--left btn btn--m btn--red btn--icon" ng-click="deleteOne($index)" lx-ripple><i class="mdi mdi-minus-circle"></i></button>
        </li>
       </ul>
