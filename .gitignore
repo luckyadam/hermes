@@ -1,3 +1,5 @@
 node_modules/
 node-debug.json
 .DS_Store
+test.js
+test.html

@@ -5,9 +5,11 @@ angular.module('manageApp')
     $routeProvider
       .when('/resources', {
         templateUrl: 'app/resources/resources.html',
-        controller: 'ResourcesCtrl'
+        controller: 'ResourcesCtrl',
+        authenticate: true
       }).when('/resources/:id', {
         templateUrl: 'app/resources/resources.html',
-        controller: 'ResourcesCtrl'
+        controller: 'ResourcesCtrl',
+        authenticate: true
       });
   });

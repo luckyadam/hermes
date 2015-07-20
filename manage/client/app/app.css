@@ -28,3 +28,13 @@ ul,li {
 .card__body {
   padding: 8px 16px;
 }
+
+.help_block {
+  font-size: 12px;
+}
+.has_success .help_block {
+  color: #3c763d;
+}
+.has_error .help_block {
+  color: #D32F2F;
+}

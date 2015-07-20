@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('manageApp')
-  .controller('AdminCtrl', function ($scope, $http, Auth, User) {
+  .controller('AdminCtrl', function ($rootScope, $scope, $http, Auth, User) {
+    $rootScope.pageName = 'admin';
 
     // Use the User $resource to fetch all users
     $scope.users = User.query();

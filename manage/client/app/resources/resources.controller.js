@@ -30,7 +30,7 @@ angular.module('manageApp')
         if (answer) {
           Resources.delete({
             id: $scope.resources[$index]._id
-          }).$promise.then(function (data) {
+          }).$promise.then(function () {
             LxNotificationService.success('删除成功');
             $scope.resources.splice($index, 1);
           });
@@ -66,7 +66,7 @@ angular.module('manageApp')
 
       delete editPage.modifyType;
 
-      if ($scope.uriValidation() || $scope.emptyValidation()) {
+      if (!$scope.uriValidation(editPage.uri) || !$scope.emptyValidation(editPage.description)) {
         LxNotificationService.error('请输入正确！');
         return;
       }
@@ -76,13 +76,13 @@ angular.module('manageApp')
       }
       delete editPage.newResources;
       if ($scope.modifyType === 'edit') {
-        Resources.update(editPage).$promise.then(function (data) {
+        Resources.update(editPage).$promise.then(function () {
           $scope.currentEdit.showLoading = false;
           LxDialogService.close('editResourcesDialog');
           getResourcesList();
         });
       } else if ($scope.modifyType === 'add') {
-        Resources.save(editPage).$promise.then(function (data) {
+        Resources.save(editPage).$promise.then(function () {
           $scope.currentEdit.showLoading = false;
           LxDialogService.close('editResourcesDialog');
           getResourcesList();

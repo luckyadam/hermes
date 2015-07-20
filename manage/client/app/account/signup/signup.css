@@ -1,4 +1,4 @@
-.login {
+.signup {
   background-color: #fff;
   margin-top: 16px;
   width: 500px;
@@ -7,9 +7,9 @@
   padding: 16px;
 }
 
-.login>h1 {
+.signup>h1 {
   font-size: 20px;
 }
-.login_operation {
+.signup_operation {
   margin-top: 16px;
 }

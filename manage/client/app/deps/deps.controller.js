@@ -13,7 +13,7 @@ angular.module('manageApp')
           $scope.depsList = data.data;
         }
       });
-    };
+    }
 
     $scope.edit = function (dep) {
       $scope.currentEdit = angular.copy(dep);
@@ -27,7 +27,9 @@ angular.module('manageApp')
 
     $scope.generate = function () {
       Deps.generateAll().$promise.then(function (data) {
-        console.log(data);
+        if (data.no === 0) {
+          LxNotificationService.success('生成文件成功！');
+        }
       });
     };
 
@@ -47,7 +49,7 @@ angular.module('manageApp')
         if (answer) {
           Deps.delete({
             id: $scope.depsList[$index]._id
-          }).$promise.then(function (data) {
+          }).$promise.then(function () {
             LxNotificationService.success('删除成功');
             $scope.depsList.splice($index, 1);
           });
@@ -92,19 +94,19 @@ angular.module('manageApp')
       editData.existDeps = _.dropRightWhile(editData.existDeps, function (item) {
         return item === null;
       });
-      if ($scope.uriValidation() || $scope.emptyValidation()) {
+      if (!$scope.uriValidation(editData.uri) || !$scope.emptyValidation(editData.description)) {
         LxNotificationService.error('请输入正确！');
         return;
       }
       $scope.currentEdit.showLoading = true;
       if ($scope.modifyType === 'edit') {
-        Deps.update(editData).$promise.then(function (data) {
+        Deps.update(editData).$promise.then(function () {
           $scope.currentEdit.showLoading = false;
           LxDialogService.close('editDepsDialog');
           getDepsList();
         });
       } else if ($scope.modifyType === 'add') {
-        Deps.save(editData).$promise.then(function (data) {
+        Deps.save(editData).$promise.then(function () {
           $scope.currentEdit.showLoading = false;
           LxDialogService.close('editDepsDialog');
           getDepsList();

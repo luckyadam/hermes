@@ -5,6 +5,7 @@ angular.module('manageApp')
     $routeProvider
       .when('/deps', {
         templateUrl: 'app/deps/deps.html',
-        controller: 'DepsCtrl'
+        controller: 'DepsCtrl',
+        authenticate: true
       });
   });

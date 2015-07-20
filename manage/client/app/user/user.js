@@ -5,6 +5,7 @@ angular.module('manageApp')
     $routeProvider
       .when('/user', {
         templateUrl: 'app/user/user.html',
-        controller: 'UserCtrl'
+        controller: 'UserCtrl',
+        authenticate: true
       });
   });
