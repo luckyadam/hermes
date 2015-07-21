@@ -96,6 +96,7 @@ exports.update = function(req, res) {
     var depPages = body.pages;
     var createDeps = body.createDeps;
     var existDeps = body.existDeps;
+    var user = req.user;
     var depsParam = [];
     if (_.isArray(createDeps) && createDeps.length > 0) {
       createDeps.forEach(function (item) {
