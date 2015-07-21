@@ -1,10 +1,51 @@
-<div class="admin common_section">
-  <p>The delete user and user index api routes are restricted to users with the 'admin' role.</p>
-  <ul class="list-group">
-    <li class="list-group-item" ng-repeat="user in users">
-        <strong>{{user.name}}</strong><br>
-        <span class="text-muted">{{user.email}}</span>
-        <a ng-click="delete(user)" class="trash"><span class="glyphicon glyphicon-trash pull-right"></span></a>
-    </li>
-  </ul>
-</div>
+<section class="admin common_section">
+  <h1>用户管理</h1>
+  <p ng-if="errorInfo">{{ errorInfo }}</p>
+  <table class="data-table" ng-if="users">
+    <thead>
+      <tr class="data-table-row">
+        <th>用户名</th>
+        <th>邮箱</th>
+        <th>权限</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="data-table-row" ng-repeat="user in users">
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.role }}</td>
+        <td>
+          <button class="btn btn--m btn--green btn--raised mr+" ng-click="modify($index)" type="button" lx-ripple>修改</button>
+          <button class="btn btn--m btn--red btn--raised" ng-click="delete($index)" type="button" lx-ripple>删除</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<lx-dialog class="dialog dialog--l" id="modifyRoleDialog" auto-close="true" onclose="closingDialog()" onscrollend="scrollEndDialog()">
+  <div class="dialog__header">
+    <div class="toolbar bgc-light-blue-700 pl++">
+      <span class="toolbar__label tc-white fs-title">
+        修改权限
+      </span>
+      <lx-progress class="deps_edit_loading" type="circular" color="#fff" ng-if="currentEdit.showLoading"></lx-progress>
+    </div>
+  </div>
+  <div class="dialog__content pl++ pr++">
+    <lx-select ng-model="currentEdit.role" placeholder="角色" choices="roleList" error="fezge" floating-label>
+        <lx-select-selected>
+          {{ $selected }}
+        </lx-select-selected>
+
+        <lx-select-choices>
+          {{ $choice }}
+        </lx-select-choices>
+    </lx-select>
+  </div>
+
+  <div class="dialog__actions">
+    <button class="btn btn--m btn--black btn--flat" lx-ripple lx-dialog-close>取消</button>
+    <button class="btn btn--m btn--black btn--flat" ng-click="saveEdit()" lx-ripple>确定</button>
+  </div>
+</lx-dialog>

@@ -11,14 +11,17 @@ exports.index = function(req, res) {
     // 根据url模糊查找
     param.uri = new RegExp(decodeURIComponent(req.query.uriReg));
   }
-  Page.find(param).sort({createTime: 'desc'}).exec(function (err, pages) {
-    if(err) { return handleError(res, err); }
-    return res.json(200, {
-      no: 0,
-      errmsg: '成功',
-      data: pages
+  Page.find(param)
+    .populate('creator')
+    .sort({createTime: 'desc'})
+    .exec(function (err, pages) {
+      if(err) { return handleError(res, err); }
+      return res.json(200, {
+        no: 0,
+        errmsg: '成功',
+        data: pages
+      });
     });
-  });
 };
 
 // Get a single page
@@ -31,7 +34,7 @@ exports.show = function(req, res) {
       data: []
     });
   }
-  Page.findById(req.params.id, function (err, page) {
+  Page.findById(req.params.id).populate('creator').exec(function (err, page) {
     console.log(err);
     if(err) { return handleError(res, err); }
     if(!page) {
@@ -51,7 +54,8 @@ exports.show = function(req, res) {
 
 // Creates a new page in the DB.
 exports.create = function(req, res) {
-  req.body.createTime = new Date().getTime();
+  req.body.createTime = new Date();
+  req.body.creator = req.user._id;
   Page.create(req.body, function(err, page) {
     page.resources.create(req.body.resources);
     if(err) { return handleError(res, err); }

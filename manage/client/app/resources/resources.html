@@ -10,11 +10,11 @@
       <div class="card__body">
         <p class="resources_item_description">{{ page.description }}</p>
         <p class="resources_item_info">
-          <span class="resources_item_author">创建者：{{ page.creator }}</span>
+          <span class="resources_item_author">创建者：{{ page.creator.name }}</span>
           <span class="resources_item_time">创建时间：{{ page.createTime | date:'yyyy-MM-dd HH:mm' }}</span>
         </p>
         <div class="resources_item_pages clearfix">
-          <a href="#/resources/{{ resource._id }}" ng-repeat="resource in page.resources" class="resources_item_pages_link btn btn--m btn--blue btn--flat" lx-ripple>{{ resource.uri }}</a>
+          <a href="/resources/{{ resource._id }}" ng-repeat="resource in page.resources" class="resources_item_pages_link btn btn--m btn--blue btn--flat" lx-ripple>{{ resource.uri }}</a>
         </div>
       </div>
     </div>

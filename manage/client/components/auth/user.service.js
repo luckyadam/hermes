@@ -12,6 +12,12 @@ angular.module('manageApp')
           controller:'password'
         }
       },
+      changeRole: {
+        method: 'PUT',
+        params: {
+          controller: 'role'
+        }
+      },
       get: {
         method: 'GET',
         params: {

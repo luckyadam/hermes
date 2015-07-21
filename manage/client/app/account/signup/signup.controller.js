@@ -17,6 +17,7 @@ angular.module('manageApp')
         .then( function() {
           // Account created, redirect to home
           $location.path('/');
+          $scope.$emit('loginSuccess');
         })
         .catch( function(err) {
           err = err.data;

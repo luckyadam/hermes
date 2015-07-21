@@ -16,6 +16,7 @@ angular.module('manageApp')
         .then( function() {
           // Logged in, redirect to home
           $location.path('/');
+          $scope.$emit('loginSuccess');
         })
         .catch( function(err) {
           $scope.errors.other = err.message;

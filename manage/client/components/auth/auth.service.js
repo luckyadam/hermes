@@ -44,9 +44,12 @@ angular.module('manageApp')
        *
        * @param  {Function}
        */
-      logout: function() {
+      logout: function(cb) {
         $cookieStore.remove('token');
         currentUser = {};
+        if (cb) {
+          cb();
+        }
       },
 
       /**

@@ -10,14 +10,18 @@ var config = require('../../config/environment');
 
 // Get list of deps
 exports.index = function(req, res) {
-  Dep.find().populate('pages').sort({createTime: 'desc'}).exec(function (err, deps) {
-    if(err) { return handleError(res, err); }
-    return res.json(200, {
-      no: 0,
-      errmsg: '成功',
-      data: deps
+  Dep.find()
+    .populate('creator')
+    .populate('pages')
+    .sort({createTime: 'desc'})
+    .exec(function (err, deps) {
+      if(err) { return handleError(res, err); }
+      return res.json(200, {
+        no: 0,
+        errmsg: '成功',
+        data: deps
+      });
     });
-  });
 };
 
 // Get a single dep
@@ -34,13 +38,12 @@ exports.create = function(req, res) {
   var body = req.body;
   var existDeps = req.body.existDeps; // 已经存在的
   var createDeps = req.body.createDeps; // 需要新创建
-  var now = new Date().getTime();
-  // var user = {UserController.me(req, res);}
+  var user = req.user;
   var depParam = {
     uri: body.uri,
     description: body.description,
-    // creator: 'admin',
-    createTime: now
+    creator: user._id,
+    createTime: new Date()
   };
   if (!_.isArray(existDeps) && !_.isArray(createDeps)) {
     return res.json(200, {
@@ -51,7 +54,10 @@ exports.create = function(req, res) {
   }
   // 需要创建新的依赖关系
   if (_.isArray(createDeps) && createDeps.length > 0) {
-    createDeps.createTime = now;
+    createDeps.forEach(function (item) {
+      item.creator = user._id;
+      item.createTime = new Date();
+    });
     Page.collection.insert(createDeps, function (err, pages) {
       if(err) {
         if (err.code === 11000) {
@@ -92,6 +98,10 @@ exports.update = function(req, res) {
     var existDeps = body.existDeps;
     var depsParam = [];
     if (_.isArray(createDeps) && createDeps.length > 0) {
+      createDeps.forEach(function (item) {
+        item.creator = user._id;
+        item.createTime = new Date();
+      });
       Page.collection.insert(createDeps, function (err, pages) {
         if(err) {
           if (err.code === 11000) {

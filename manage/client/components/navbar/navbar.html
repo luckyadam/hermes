@@ -13,10 +13,10 @@
     </h1>
     <nav class="main-nav main-nav--lap-and-up">
       <ul>
-        <li><a href="#/deps" class="main-nav__link" ng-class="{true: 'active'}[pageName === 'deps']" lx-ripple="white">页面依赖</a></li>
-        <li><a href="#/resources" class="main-nav__link" ng-class="{true: 'active'}[pageName === 'resources']" lx-ripple="white">静态资源</a></li>
-        <li><a href="#/user" class="main-nav__link" lx-ripple="white">操作记录</a></li>
-        <li ng-if="isAdmin"><a href="#/admin" class="main-nav__link" ng-class="{true: 'active'}[pageName === 'admin']" lx-ripple="white">用户管理</a></li>
+        <li><a href="/deps" class="main-nav__link" ng-class="{true: 'active'}[pageName === 'deps']" lx-ripple="white">页面依赖</a></li>
+        <li><a href="/resources" class="main-nav__link" ng-class="{true: 'active'}[pageName === 'resources']" lx-ripple="white">静态资源</a></li>
+        <li><a href="/user" class="main-nav__link" lx-ripple="white">操作记录</a></li>
+        <li ng-if="isAdmin"><a href="/admin" class="main-nav__link" ng-class="{true: 'active'}[pageName === 'admin']" lx-ripple="white">用户管理</a></li>
         <li class="main-user">
           <lx-dropdown>
             <button class="btn btn--m btn--white btn--flat" lx-ripple lx-dropdown-toggle>
@@ -25,7 +25,7 @@
 
             <lx-dropdown-menu>
               <ul>
-                <li><a class="dropdown-link" ng-href="#/settings">更改密码</a></li>
+                <li><a class="dropdown-link" ng-href="/settings">更改密码</a></li>
                 <li><a class="dropdown-link" ng-click="logout()">退出登录</a></li>
               </ul>
             </lx-dropdown-menu>
@@ -43,12 +43,12 @@
         <lx-dropdown-menu>
           <ul>
             <li><span class="dropdown-link dropdown-link--is-header">{{ currentUser.name }}</span></li>
-            <li><a href="#/deps" class="dropdown-link">页面依赖</a></li>
-            <li><a href="#/resources" class="dropdown-link">静态资源</a></li>
-            <li><a href="#/user" class="dropdown-link">操作记录</a></li>
-            <li ng-if="isAdmin"><a href="#/admin" class="dropdown-link">用户管理</a></li>
+            <li><a href="/deps" class="dropdown-link">页面依赖</a></li>
+            <li><a href="/resources" class="dropdown-link">静态资源</a></li>
+            <li><a href="/user" class="dropdown-link">操作记录</a></li>
+            <li ng-if="isAdmin"><a href="/admin" class="dropdown-link">用户管理</a></li>
             <li class="dropdown-divider"></li>
-            <li><a href="#/settings" class="dropdown-link">更改密码</a></li>
+            <li><a href="/settings" class="dropdown-link">更改密码</a></li>
             <li><a ng-click="logout()" class="dropdown-link">退出登录</a></li>
           </ul>
         </lx-dropdown-menu>

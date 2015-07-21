@@ -14,7 +14,7 @@ angular.module('manageApp', [
         redirectTo: '/deps'
       });
 
-    // $locationProvider.html5Mode(true);
+    $locationProvider.html5Mode(true);
     $httpProvider.interceptors.push('authInterceptor');
   })
 
@@ -52,5 +52,13 @@ angular.module('manageApp', [
           $location.path('/login');
         }
       });
+    });
+
+    $rootScope.$on('loginSuccess', function () {
+      $rootScope.$broadcast('loginBroadcast', true);
+    });
+
+    $rootScope.$on('logoutSuccess', function () {
+      $rootScope.$broadcast('logoutBroadcast', true);
     });
   });
