@@ -121,12 +121,10 @@ exports.update = function(req, res) {
         depsParam = depsParam.concat(pagesIds);
         depPages = _.pluck(depPages, '_id');
         depPages = depPages.concat(depsParam);
+        dep.uri = req.body.uri;
+        dep.description = req.body.description;
         dep.pages = depPages;
-        delete req.body.pages;
-        delete req.body.createDeps;
-        delete req.body.existDeps;
-        var updated = _.assign(dep, req.body);
-        updated.save(function (err) {
+        dep.save(function (err) {
           if (err) { return handleError(res, err); }
           return res.json(200, {
             no: 0,
@@ -143,11 +141,9 @@ exports.update = function(req, res) {
       depPages = _.pluck(depPages, '_id');
       depPages = depPages.concat(depsParam);
       dep.pages = depPages;
-      delete req.body.pages;
-      delete req.body.createDeps;
-      delete req.body.existDeps;
-      var updated = _.assign(dep, req.body);
-      updated.save(function (err) {
+      dep.uri = req.body.uri;
+      dep.description = req.body.description;
+      dep.save(function (err) {
         if (err) { return handleError(res, err); }
         return res.json(200, {
           no: 0,
@@ -173,18 +169,45 @@ exports.destroy = function(req, res) {
 
 // 读取所有数据，生成配置文件
 exports.generateAll = function (req, res) {
-  Dep.find().populate('pages').exec(function (err, deps) {
-    if(err) { return handleError(res, err); }
-    fs.writeFile(path.join(config.root + '/server/data', 'config_file.js'), JSON.stringify(deps), function (err) {
-      if (err) {
-        throw err;
-      }
-      return res.json(200, {
-        no: 0,
-        errmsg: '生成文件成功'
+  Dep.find({}, '-creator -createTime -_id -__v')
+    .populate({
+      path: 'pages',
+      match: { enabled: true },
+      select: '-uri -description -enabled -creator -createTime -_id -__v -resources.enabled -resources._id'
+    }).exec(function (err, deps) {
+      if(err) { return handleError(res, err); }
+      var date = new Date();
+      var now = date.getTime();
+      var fileName = path.join(config.root + '/server/data', 'config_file_' + now + '.js');
+      // 将MongooseCollection转为普通array
+      deps = deps.map(function (item) {
+        return item.toObject();
+      });
+
+      // 针对数据进行必要处理
+      deps.forEach(function (dep) {
+        dep.resources = [];
+        if (_.isArray(dep.pages) && dep.pages.length > 0) {
+          dep.pages.forEach(function (page) {
+            if (page.resources) {
+              page.resources.forEach(function (resource) {
+                dep.resources.push(resource);
+              });
+            }
+          });
+        }
+        delete dep.pages;
+      });
+      fs.writeFile(fileName, JSON.stringify(deps), function (err) {
+        if (err) {
+          throw err;
+        }
+        return res.json(200, {
+          no: 0,
+          errmsg: '生成文件成功'
+        });
       });
     });
-  });
 };
 
 function handleError(res, err) {
