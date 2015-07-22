@@ -6,27 +6,18 @@ var AutoStat = {
   bind: function () {
     Util.addEvent(document, 'click', function (e) {
       var target = e.target || e.srcElement;
-      var locate = target.getAttribute('locate');
-      var project = null; // 项目名称
-      var page = null; // 具体页面
-      var region = null; // 区域名称
-      var pageUrl = global.location.href;
-      var image = null;
-      if (!locate) {
+      var href = target.getAttribute('href'); // href属性
+      var urlReg = /^(http[s]?:\/\/(www\.)?|ftp:\/\/(www\.)?|www\.){1}([0-9A-Za-z-\.@:%_+~#=]+)+((\.[a-zA-Z]{2,3})+)(\/(.)*)?(\?(.)*)?/;
+      // 只统计包含href，并且href是正常url的情况
+      if (!href || (!urlReg.test(href) && !href.indexOf('/') >= 0)) {
         return;
       }
-      locate = locate.split('#');
-      var len = lcoate.length;
-      if (len >= 3) {
-        project = locate[0];
-        page = locate[1];
-        region = locate[2];
-      } else {
-        page = locate[0];
-        region = locate[1];
-      }
+
+      var pageUrl = window.location.href;
+      var description = document.title;
+
       image = new Image();
-      image.src = '' + '&u=' + pageUrl + '&project=' + project + '&page=' + page + '&region=' + region;
+      image.src = '' + '&page=' + pageUrl + '&description=' + description + '&goto=' + href;
     });
   }
 };
