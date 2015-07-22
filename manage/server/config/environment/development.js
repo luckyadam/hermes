@@ -8,5 +8,7 @@ module.exports = {
     uri: 'mongodb://localhost/manage-dev'
   },
 
-  seedDB: false
+  seedDB: false,
+
+  staticPath: '/client/',
 };

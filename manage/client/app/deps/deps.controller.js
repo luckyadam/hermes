@@ -28,9 +28,21 @@ angular.module('manageApp')
     $scope.generate = function () {
       Deps.generateAll().$promise.then(function (data) {
         if (data.no === 0) {
-          LxNotificationService.success('生成文件成功！');
+          $scope.publishData = {
+            showLoading: false,
+            publishBtnText: '发布文件到线上',
+            fileUrl: data.data.path,
+            fileName: data.data.fileName
+          };
+          LxDialogService.open('publishDialog');
         }
       });
+    };
+
+    $scope.publish = function () {
+      $scope.publishData.publishing = true;
+      $scope.publishData.showLoading = true;
+      $scope.publishData.publishBtnText = '正在发布...';
     };
 
     $scope.add = function () {

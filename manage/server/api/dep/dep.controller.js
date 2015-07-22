@@ -170,26 +170,52 @@ exports.destroy = function(req, res) {
 // 读取所有数据，生成配置文件
 exports.generateAll = function (req, res) {
   Dep.find({}, '-creator -createTime -_id -__v')
+    .sort({createTime: 'desc'})
     .populate({
       path: 'pages',
-      match: { enabled: true },
-      select: '-uri -description -enabled -creator -createTime -_id -__v -resources.enabled -resources._id'
+      // match: { $or: [{'enabled': true}, {'enabled': { $exists: true }}] },
+      select: '-uri -description -creator -createTime -_id -__v -resources.enabled -resources._id'
     }).exec(function (err, deps) {
       if(err) { return handleError(res, err); }
       var date = new Date();
       var now = date.getTime();
-      var fileName = path.join(config.root + '/server/data', 'config_file_' + now + '.js');
+      var folderName = config.root + config.staticPath + 'data';
+      var newFile = path.join(folderName, 'config_file_' + now + '.conf');
+      var defaultFile = path.join(folderName, 'config_file.conf');
+      var existPromise = function () {
+        return new Promise(function (resolve, reject) {
+          fs.exists(folderName, function (exists) {
+            if (exists) {
+              resolve();
+            } else {
+              reject();
+            }
+          });
+        });
+      };
+
+      var mkdirPromise = function () {
+        return new Promise(function (resolve, reject) {
+          fs.mkdir(folderName, function (err) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        });
+      };
+
       // 将MongooseCollection转为普通array
       deps = deps.map(function (item) {
         return item.toObject();
       });
-
       // 针对数据进行必要处理
       deps.forEach(function (dep) {
         dep.resources = [];
         if (_.isArray(dep.pages) && dep.pages.length > 0) {
           dep.pages.forEach(function (page) {
-            if (page.resources) {
+            if (page.resources && page.enabled) {
               page.resources.forEach(function (resource) {
                 dep.resources.push(resource);
               });
@@ -198,15 +224,24 @@ exports.generateAll = function (req, res) {
         }
         delete dep.pages;
       });
-      fs.writeFile(fileName, JSON.stringify(deps), function (err) {
-        if (err) {
-          throw err;
-        }
-        return res.json(200, {
-          no: 0,
-          errmsg: '生成文件成功'
+      existPromise().then(function () {
+      }, mkdirPromise).then(function () {
+        fs.writeFile(newFile, JSON.stringify(deps), function (err) {
+          if (err) {
+            throw err;
+          }
+          fs.createReadStream(newFile).pipe(fs.createWriteStream(defaultFile));
+          return res.json(200, {
+            no: 0,
+            errmsg: '生成文件成功',
+            data: {
+              fileName: 'config_file.conf',
+              path: '/data/' + 'config_file.conf'
+            }
+          });
         });
       });
+
     });
 };
 

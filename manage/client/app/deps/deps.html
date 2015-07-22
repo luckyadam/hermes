@@ -90,3 +90,20 @@
     <button class="btn btn--m btn--black btn--flat" ng-click="saveEdit()" lx-ripple>确定</button>
   </div>
 </lx-dialog>
+
+<lx-dialog class="dialog dialog--l publish_dialog" id="publishDialog" auto-close="true" onclose="closingDialog()" onscrollend="scrollEndDialog()">
+  <div class="dialog__header">
+    <div class="toolbar bgc-light-blue-700 pl++">
+      <span class="toolbar__label tc-white fs-title">
+        发布
+      </span>
+      <lx-progress class="deps_edit_loading" type="circular" color="#fff" ng-if="publishData.showLoading"></lx-progress>
+    </div>
+  </div>
+
+  <div class="dialog__content p++">
+    <p>生成文件成功！</p>
+    <p><a href="{{ publishData.fileUrl }}" class="publish_file" target="_blank" download>{{ publishData.fileName }}</a></p>
+    <p><button class="btn btn--m btn--green btn--raised" ng-click="publish()" ng-disabled="publishData.publishing" lx-ripple>{{ publishData.publishBtnText }}</button></p>
+  </div>
+</lx-dialog>

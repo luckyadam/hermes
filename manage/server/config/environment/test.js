@@ -6,5 +6,6 @@ module.exports = {
   // MongoDB connection options
   mongo: {
     uri: 'mongodb://localhost/manage-test'
-  }
+  },
+  staticPath: '/client/'
 };
