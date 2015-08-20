@@ -12,6 +12,6 @@ router.post('/', auth.isAuthenticated(), controller.create);
 router.put('/:id', auth.isAuthenticated(), controller.update);
 router.patch('/:id', auth.isAuthenticated(), controller.update);
 router.delete('/:id', auth.isAuthenticated(), controller.destroy);
-router.post('/generate/all', auth.isAuthenticated(), controller.generateAll);
+router.post('/generate/:id', auth.isAuthenticated(), controller.generate);
 
 module.exports = router;

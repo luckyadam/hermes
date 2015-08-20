@@ -9,7 +9,7 @@
   font-size: 12px;
   float: right;
 }
-.deps_add,.deps_generate {
+.deps_add,.deps_generate,.deps_item_generate {
   float: right;
 }
 .deps_generate {

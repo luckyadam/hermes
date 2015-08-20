@@ -3,17 +3,17 @@
 angular.module('manageApp')
   .factory('Deps', function ($resource) {
     return $resource('/api/deps/:id/:controller', {
-      id: '@_id'
+      id: '@_id',
+      controller: '@id'
     },
     {
       update: {
         method: 'PUT'
       },
-      generateAll: {
+      generate: {
         method: 'POST',
         params: {
-          id: 'generate',
-          controller: 'all'
+          id: 'generate'
         }
       }
 

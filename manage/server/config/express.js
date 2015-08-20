@@ -16,6 +16,8 @@ var path = require('path');
 var config = require('./environment');
 var passport = require('passport');
 var session = require('express-session');
+var mongoStore = require('connect-mongo')(session);
+var mongoose = require('mongoose');
 
 module.exports = function(app) {
   var env = app.get('env');
@@ -24,12 +26,20 @@ module.exports = function(app) {
   app.engine('html', require('ejs').renderFile);
   app.set('view engine', 'html');
   app.use(compression());
-  // app.use(bodyParser.urlencoded({ extended: false }));
-  // app.use(bodyParser.json());
-  app.use(bodyParser());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
   app.use(methodOverride());
   app.use(cookieParser());
   app.use(passport.initialize());
+  app.use(session({
+    secret: config.secrets.session,
+    resave: true,
+    saveUninitialized: false,
+    store: new mongoStore({
+      mongooseConnection: mongoose.connection,
+      db: 'manage'
+    })
+  }));
   if ('production' === env) {
     app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
     app.use(express.static(path.join(config.root, 'public')));

@@ -45,6 +45,10 @@ angular.module('manageApp')
        * @param  {Function}
        */
       logout: function(cb) {
+        $http.post('/auth/local/logout')
+        .success(function() {
+          console.log('xxx');
+        });
         $cookieStore.remove('token');
         currentUser = {};
         if (cb) {

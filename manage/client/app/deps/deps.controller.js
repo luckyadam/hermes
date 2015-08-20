@@ -25,8 +25,10 @@ angular.module('manageApp')
       LxDialogService.open('editDepsDialog');
     };
 
-    $scope.generate = function () {
-      Deps.generateAll().$promise.then(function (data) {
+    $scope.generate = function (dep) {
+      Deps.generate({
+        id: dep._id
+      }).$promise.then(function (data) {
         if (data.no === 0) {
           $scope.publishData = {
             showLoading: false,

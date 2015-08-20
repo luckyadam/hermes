@@ -1,11 +1,12 @@
 <section class="deps common_section">
-  <h1 class="clearfix">页面依赖管理<button class="btn btn--m btn--green btn--raised deps_add" ng-click="add()" lx-ripple>新增页面</button><button class="btn btn--m btn--green btn--raised deps_generate" ng-click="generate()" lx-ripple>生成文件</button></h1>
+  <h1 class="clearfix">页面依赖管理<button class="btn btn--m btn--green btn--raised deps_add" ng-click="add()" lx-ripple>新增页面</button></h1>
   <div class="deps_list">
     <div class="card deps_item" ng-repeat="depItem in depsList">
       <div class="card__header clearfix">
         <span class="deps_item_url">{{ depItem.uri }}</span>
         <button ng-click="delete($index)" class="deps_item_delete btn btn--m btn--red btn--icon" lx-ripple><i class="mdi mdi-delete"></i></button>
         <button ng-click="edit(depItem)" class="deps_item_edit btn btn--m btn--blue btn--icon" lx-ripple><i class="mdi mdi-pencil"></i></button>
+        <button ng-click="generate(depItem)" class="deps_item_generate btn btn--s btn--blue btn--raised" lx-ripple>生成文件</button>
       </div>
       <div class="card__body">
         <p class="deps_item_description">{{ depItem.description }}</p>

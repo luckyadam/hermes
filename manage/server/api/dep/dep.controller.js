@@ -10,7 +10,17 @@ var config = require('../../config/environment');
 
 // Get list of deps
 exports.index = function(req, res) {
-  Dep.find()
+  var user = req.session.user;
+  if (!user) {
+    res.json(404, {
+      errmsg: '尚未登录'
+    })
+  }
+  var searchParam = {};
+  if (user.role === 'user') {
+    searchParam.creator = user._id;
+  }
+  Dep.find(searchParam)
     .populate('creator')
     .populate('pages')
     .sort({createTime: 'desc'})
@@ -167,21 +177,22 @@ exports.destroy = function(req, res) {
   });
 };
 
-// 读取所有数据，生成配置文件
-exports.generateAll = function (req, res) {
-  Dep.find({}, '-creator -createTime -_id -__v')
+// 读取数据，生成配置文件
+exports.generate = function (req, res) {
+  var depId = req.params.id;
+  Dep.findById(depId, '-creator -createTime -_id -__v')
     .sort({createTime: 'desc'})
     .populate({
       path: 'pages',
       // match: { $or: [{'enabled': true}, {'enabled': { $exists: true }}] },
       select: '-uri -description -creator -createTime -_id -__v -resources.enabled -resources._id'
-    }).exec(function (err, deps) {
+    }).exec(function (err, dep) {
       if(err) { return handleError(res, err); }
       var date = new Date();
       var now = date.getTime();
       var folderName = config.root + config.staticPath + 'data';
-      var newFile = path.join(folderName, 'config_file_' + now + '.conf');
-      var defaultFile = path.join(folderName, 'config_file.conf');
+      var newFile = path.join(folderName, 'config_file_' + depId + '_' + now + '.conf');
+      var defaultFile = path.join(folderName, 'config_file_' + depId + '.conf');
       var existPromise = function () {
         return new Promise(function (resolve, reject) {
           fs.exists(folderName, function (exists) {
@@ -206,27 +217,23 @@ exports.generateAll = function (req, res) {
         });
       };
 
-      // 将MongooseCollection转为普通array
-      deps = deps.map(function (item) {
-        return item.toObject();
-      });
+      dep = dep.toObject();
+
       // 针对数据进行必要处理
-      deps.forEach(function (dep) {
-        dep.resources = [];
-        if (_.isArray(dep.pages) && dep.pages.length > 0) {
-          dep.pages.forEach(function (page) {
-            if (page.resources && page.enabled) {
-              page.resources.forEach(function (resource) {
-                dep.resources.push(resource);
-              });
-            }
-          });
-        }
-        delete dep.pages;
-      });
+      dep.resources = [];
+      if (_.isArray(dep.pages) && dep.pages.length > 0) {
+        dep.pages.forEach(function (page) {
+          if (page.resources && page.enabled) {
+            page.resources.forEach(function (resource) {
+              dep.resources.push(resource);
+            });
+          }
+        });
+      }
+      delete dep.pages;
       existPromise().then(function () {
       }, mkdirPromise).then(function () {
-        fs.writeFile(newFile, JSON.stringify(deps), function (err) {
+        fs.writeFile(newFile, JSON.stringify(dep), function (err) {
           if (err) {
             throw err;
           }
@@ -235,8 +242,8 @@ exports.generateAll = function (req, res) {
             no: 0,
             errmsg: '生成文件成功',
             data: {
-              fileName: 'config_file.conf',
-              path: '/data/' + 'config_file.conf'
+              fileName: 'config_file_' + depId + '.conf',
+              path: '/data/config_file_' + depId + '.conf'
             }
           });
         });
