@@ -43,6 +43,20 @@ var Util = {
     }
   },
 
+  uuid: function () {
+    var s = [];
+    var hexDigits = '0123456789ABCDEF';
+    for (var i = 0; i < 36; i++) {
+      s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    }
+    s[14] = '4';  // bits 12-15 of the time_hi_and_version field to 0010
+    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+    s[8] = s[13] = s[18] = s[23] = '-';
+
+    var uuid = s.join('');
+    return uuid;
+  },
+
   /** 仅仅是浅拷贝 */
   extend: function (destination, source) {
     for(var key in source) {
@@ -66,7 +80,7 @@ var Util = {
       }
     }
 
-    if (xhr !== null) {
+    if (xhr === null) {
       return;
     }
     options = this.extend({
@@ -82,7 +96,7 @@ var Util = {
       this.forEach(options.data, function (item, key) {
         dataStr += key + '=' + global.encodeURIComponent(item) + '&';
       });
-      dataStr = substr(0, dataStr.length - 1);
+      dataStr = dataStr.substr(0, dataStr.length - 1);
       if (options.url.indexOf('?') >= 0) {
         options.url += '&' + dataStr;
       } else {
@@ -93,7 +107,7 @@ var Util = {
     if (options.method === 'GET') {
       xhr.send(null);
     } else if (options.method === 'POST') {
-      xhr.send(options.data);
+      xhr.send(dataStr);
     }
 
     xhr.onreadystatechange = function () {
@@ -107,7 +121,7 @@ var Util = {
     };
   },
 
-  addEvent: function add_event() {
+  addEvent: (function add_event() {
     if (document.addEventListener) {
       return function (element, type, handle) {
         if (element.length) {
@@ -131,5 +145,50 @@ var Util = {
         }
       };
     }
+  })(),
+
+  isDocument: function (obj) {
+    return obj != null && obj.nodeType == obj.DOCUMENT_NODE;
+  },
+
+  // 一个简单的css选择器 from zepto
+  qsa: function (element, selector) {
+    var found,
+        maybeID = selector[0] == '#',
+        maybeClass = !maybeID && selector[0] == '.',
+        nameOnly = maybeID || maybeClass ? selector.slice(1) : selector,
+        isSimple = /^[\w-]*$/.test(nameOnly);
+    return (Util.isDocument(element) && isSimple && maybeID) ?
+      ((found = element.getElementById(nameOnly)) ? [found] : []) :
+      (element.nodeType !== 1 && element.nodeType !== 9) ? [] :
+      Array.prototype.slice.call(
+        isSimple && !maybeID ?
+          maybeClass ? element.getElementsByClassName(nameOnly) :
+          element.getElementsByTagName(selector) :
+          element.querySelectorAll(selector)
+      );
+  },
+
+  matches: function (element, selector) {
+    if (!selector || !element || element.nodeType !== 1) {
+      return false;
+    }
+    var matchesSelector = element.webkitMatchesSelector || element.msMatchesSelector ||
+                          element.mozMatchesSelector ||
+                          element.oMatchesSelector || element.matchesSelector
+    if (matchesSelector) {
+      return matchesSelector.call(element, selector);
+    }
+
+    var match,
+        parent = element.parentNode,
+        tempParent = document.createElement('div'),
+        temp = !parent;
+    if (temp) {
+      (parent = tempParent).appendChild(element);
+    }
+    match = ~Util.qsa(parent, selector).indexOf(element);
+    temp && tempParent.removeChild(element);
+    return match;
   }
 };

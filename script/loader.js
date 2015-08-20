@@ -44,6 +44,7 @@ var Loader = function (options) {
     onComplete: null,
     onError: null
   };
+  this._file = {};
   this._status = StatusEnum.FileStatus.NOSTART;
   var ua = navigator.userAgent;
   this._isIE = ua.indexOf('MSIE') >= 0;
@@ -60,7 +61,7 @@ Loader.prototype = {
    */
   _onload: function () {
     this._status = StatusEnum.FileStatus.COMPLETE;
-    this.runHandler(this.handler.onComplete, this._url);
+    this.runHandler(this.handler.onComplete, this._file);
   },
 
   /**
@@ -70,7 +71,7 @@ Loader.prototype = {
    */
   _onerror: function () {
     this._status = StatusEnum.FileStatus.ERROR;
-    this.runHandler(this.handler.onError, this._url);
+    this.runHandler(this.handler.onError, this._file);
   },
 
   /**
@@ -93,23 +94,24 @@ Loader.prototype = {
    *
    * @param {Object} param
    * @param {String} param.url - 文件url
+   * @param {String} param.type - 文件类型
    * @return {Loader} this
    */
   process: function (param) {
-    this._url = param.url;
-    if (!this._url) {
+    this._file = param;
+    if (!this._file.url) {
       return;
     }
     var object = null;
     this._status = StatusEnum.FileStatus.RUNNING;
     if (this._isIE) {
       object = new Image();
-      object.src = this._url;
+      object.src = this._file.url;
       object.onload = Util.proxy(this._onload, this);
       object.onerror = Util.proxy(this._onerror, this);
     } else {
       object = document.createElement('object');
-      object.data = this._url;
+      object.data = this._file.url;
       object.width  = 0;
       object.height = 0;
       object.onload = Util.proxy(this._onload, this);
@@ -213,10 +215,12 @@ LoaderPool.prototype = {
    * _onItemComplete - 单个文件下载完成后的回调
    *
    * @private
-   * @param {String} item 文件url
+   * @param {Object} item
+   * @param {String} item.url 文件url
+   * @param {String} item.type 文件类型
    */
   _onItemComplete: function (item) {
-    this.runHandler(this.handler.onItemComplete, item);
+    this.runHandler(this.handler.onItemComplete, item.url);
     this._complete.push(item);
     this._toComplete();
     this._toContinue();
@@ -227,10 +231,12 @@ LoaderPool.prototype = {
    * _onItemError - 单个文件下载失败时的回调
    *
    * @private
-   * @param {String} item 文件url
+   * @param {Object} item
+   * @param {String} item.url 文件url
+   * @param {String} item.type 文件类型
    */
   _onItemError: function (item) {
-    this.runHandler(this.handler.onItemError, item)
+    this.runHandler(this.handler.onItemError, item.url)
       .runHandler(this.handler.onError, item);
     this._toComplete();
     this._toContinue();
@@ -300,9 +306,10 @@ LoaderPool.prototype = {
       if (loader !== null) {
         var item = this._queue.pop();
         if (!! item) {
-          this.runHandler(this.handler.onItemStart, item);
+          this.runHandler(this.handler.onItemStart, item.uri);
           loader.process({
-            url: item
+            url: item.uri,
+            type: item.type
           });
         }
       }
@@ -375,14 +382,17 @@ LoaderPool.prototype = {
 /** 资源下载器，实例化下载池子 **/
 var ResourceLoader = {
   load: function (param) {
-    var deps = param.deps || null;
-    if (deps === null || !deps.length) {
+    var resources = param.resources || null;
+    if (resources === null || !resources.length) {
       console.warn('依赖资源列表为空，本次将不预加载任何内容！');
       return;
     }
 
     var timeStat = {};
     var loaderPool = new LoaderPool();
+
+    // 生成一个UUID，用来标识资源的加载
+    var flag = Util.uuid();
 
     // 绑定各种事件，开始执行下载
     loaderPool.bind('onStart', function () {
@@ -397,38 +407,60 @@ var ResourceLoader = {
       var endTimeStamp = endDate.getTime();
       timeStat[url] && (timeStat[url].endTime = endTimeStamp);
       console.log('资源 ' + url + '下载完成！');
+      Util.ajax({
+        method: 'GET',
+        url: 'http://labs.qiang.it/tools/hermes/api.php',
+        data: {
+          act: 'reportLoad',
+          page: global.encodeURIComponent(global.location.href),
+          resourceUrl: global.encodeURIComponent(url),
+          isLoaded: 1,
+          flag: flag,
+          startTime: timeStat[url].startTime,
+          endTime: timeStat[url].endTime
+        }
+      });
     }).bind('onItemError', function (url) {
-      console.log('资源 ' + url + '加载失败');
+      Util.ajax({
+        method: 'GET',
+        url: 'http://labs.qiang.it/tools/hermes/api.php',
+        data: {
+          act: 'reportLoad',
+          page: global.encodeURIComponent(global.location.href),
+          resourceUrl: global.encodeURIComponent(url),
+          isLoaded: 0,
+          flag: flag,
+          startTime: timeStat[url].startTime,
+          endTime: timeStat[url].endTime
+        }
+      });
     }).bind('onComplete', function () {
       console.log(timeStat);
     }).process({
-      queue: deps
+      queue: resources
     });
   }
 };
 
 // 在window onload中去预加载资源
-// global.onload = function () {
-//   // 首先想服务请求资源列表
-//   Util.ajax({
-//     method: 'GET',
-//     url: '',
-//     data: {
-//       id: global.location.href
-//     },
-//     success: function (data) {
-//       console.log(data);
-//       ResourceLoader.load(data);
-//     }
-//   });
-// };
-ResourceLoader.load({
-  "deps":[
-    "http://labs.qiang.it/labs/preloader/images/bg1.png",
-    "http://labs.qiang.it/labs/preloader/images/bg2.jpg",
-    "http://labs.qiang.it/labs/preloader/images/bg3.jpg",
-    "http://labs.qiang.it/labs/preloader/jquery-test.js",
-    "http://labs.qiang.it/labs/preloader/step_2.css",
-    "test.js",
-  ]
-});
+global.onload = function () {
+  // 首先想服务请求资源列表
+  Util.ajax({
+    method: 'GET',
+    url: 'http://labs.qiang.it/tools/hermes/api.php',
+    data: {
+      act: 'getResourceList',
+      uri: global.encodeURIComponent(global.location.href)
+    },
+    success: function (data) {
+      try {
+        data = JSON.parse(data);
+      } catch (err) {
+        data = { errCode : 1 };
+      }
+      if (data.errCode === 0) {
+        ResourceLoader.load(data.data);
+      }
+    }
+  });
+};

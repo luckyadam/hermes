@@ -16,9 +16,10 @@
   ],
   "devDependencies": {
     "gulp": "^3.8.1",
+    "gulp-beautify": "^1.1.2",
     "gulp-concat": "latest",
-    "gulp-uglify": "latest",
     "gulp-rename": "latest",
+    "gulp-uglify": "latest",
     "gulp-watch": "latest"
   },
   "author": "luckyadam",

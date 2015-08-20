@@ -3,6 +3,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var watch = require('gulp-watch');
+var beautify = require('gulp-beautify');
 
 gulp.task('build', function () {
   gulp.src([
@@ -12,6 +13,7 @@ gulp.task('build', function () {
     'script/auto_statistics.js',
     'script/end.js'
   ]).pipe(concat('loader.js'))
+    .pipe(beautify({ indentSize: 2 }))
     .pipe(gulp.dest('dist'))
     .pipe(uglify())
     .pipe(rename('loader.min.js'))
