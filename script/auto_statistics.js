@@ -29,5 +29,3 @@ var AutoStat = {
     });
   }
 };
-
-AutoStat.bind();

@@ -1,5 +1,11 @@
 /** 一些基础性方法 */
 var Util = {
+
+  isIE: function () {
+    var userAgent = navigator.userAgent.toLowerCase();
+    return (userAgent.indexOf('msie') != -1) ? parseInt(userAgent.split('msie')[1]) : false;
+  },
+
   /** 获取元素类型 */
   getType: function (arg) {
     return Object.prototype.toString.call(arg);
@@ -42,6 +48,17 @@ var Util = {
       }
     }
   },
+
+  console: (function (str) {
+    var console = global.console;
+    if (console) {
+      return console;
+    }
+    return {
+      log: function () {},
+      warn: function () {}
+    };
+  })(),
 
   uuid: function () {
     var s = [];

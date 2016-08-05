@@ -384,7 +384,7 @@ var ResourceLoader = {
   load: function (param) {
     var resources = param.resources || null;
     if (resources === null || !resources.length) {
-      console.warn('依赖资源列表为空，本次将不预加载任何内容！');
+      Util.console.warn('依赖资源列表为空，本次将不预加载任何内容！');
       return;
     }
 
@@ -396,7 +396,7 @@ var ResourceLoader = {
 
     // 绑定各种事件，开始执行下载
     loaderPool.bind('onStart', function () {
-      console.log('开始下载');
+      Util.console.log('开始下载');
     }).bind('onItemStart', function (url) {
       var startDate = new Date();
       var startTimeStamp = startDate.getTime();
@@ -406,61 +406,35 @@ var ResourceLoader = {
       var endDate = new Date();
       var endTimeStamp = endDate.getTime();
       timeStat[url] && (timeStat[url].endTime = endTimeStamp);
-      console.log('资源 ' + url + '下载完成！');
-      Util.ajax({
-        method: 'GET',
-        url: 'http://labs.qiang.it/tools/hermes/api.php',
-        data: {
-          act: 'reportLoad',
-          page: global.encodeURIComponent(global.location.href),
-          resourceUrl: global.encodeURIComponent(url),
-          isLoaded: 1,
-          flag: flag,
-          startTime: timeStat[url].startTime,
-          endTime: timeStat[url].endTime
-        }
-      });
+      Util.console.log('资源 ' + url + '下载完成！');
     }).bind('onItemError', function (url) {
-      Util.ajax({
-        method: 'GET',
-        url: 'http://labs.qiang.it/tools/hermes/api.php',
-        data: {
-          act: 'reportLoad',
-          page: global.encodeURIComponent(global.location.href),
-          resourceUrl: global.encodeURIComponent(url),
-          isLoaded: 0,
-          flag: flag,
-          startTime: timeStat[url].startTime,
-          endTime: timeStat[url].endTime
-        }
-      });
+      Util.console.log('资源 ' + url + '下载失败！');
     }).bind('onComplete', function () {
-      console.log(timeStat);
+      Util.console.log(timeStat);
     }).process({
       queue: resources
     });
   }
 };
-
-// 在window onload中去预加载资源
-global.onload = function () {
-  // 首先想服务请求资源列表
-  Util.ajax({
-    method: 'GET',
-    url: 'http://labs.qiang.it/tools/hermes/api.php',
-    data: {
-      act: 'getResourceList',
-      uri: global.encodeURIComponent(global.location.href)
-    },
-    success: function (data) {
-      try {
-        data = JSON.parse(data);
-      } catch (err) {
-        data = { errCode : 1 };
+var isIE = Util.isIE();
+if (!isIE || isIE >= 8) {
+  // 在window onload中去预加载资源
+  global.onload = function () {
+    // 从cdn请求资源列表
+    var hermesConf = global.hermesConf;
+    Util.ajax({
+      method: 'GET',
+      url: hermesConf.resUrl,
+      success: function (data) {
+        try {
+          data = JSON.parse(data);
+        } catch (err) {
+          data = null;
+        }
+        if (data) {
+          ResourceLoader.load(data);
+        }
       }
-      if (data.errCode === 0) {
-        ResourceLoader.load(data.data);
-      }
-    }
-  });
-};
+    });
+  };
+}
